@@ -1,0 +1,64 @@
+{
+  "radius": {
+    "server": "192.168.1.1",
+    "port": 1812,
+    "secret": "radius-secret"
+  },
+  "eap_types": {
+    "eap_md5": {
+      "method": "MD5",
+      "identity": "testuser",
+      "password": "changeme"
+    },
+    "eap_tls": {
+      "method": "TLS",
+      "identity": "testuser",
+      "client_cert": "path/to/client.crt",
+      "private_key": "path/to/client.key",
+      "private_key_passwd": "changeme"
+    },
+    "eap_peap": {
+      "method": "PEAP",
+      "identity": "testuser",
+      "password": "changeme",
+      "ca_cert": "path/to/ca.pem"
+    },
+    "eap_ttls": {
+      "method": "TTLS",
+      "identity": "testuser",
+      "password": "changeme",
+      "ca_cert": "path/to/ca.pem"
+    },
+    "eap_pwd": {
+      "method": "PWD",
+      "identity": "testuser",
+      "password": "changeme"
+    },
+    "eap_fast": {
+      "method": "FAST",
+      "identity": "testuser",
+      "password": "changeme",
+      "ca_cert": "path/to/ca.pem"
+    },
+    "eap_leap": {
+      "method": "LEAP",
+      "identity": "testuser",
+      "password": "changeme"
+    },
+    "eap_sim": {
+      "method": "SIM",
+      "identity": "testuser",
+      "password": "changeme"
+    },
+    "eap_aka": {
+      "method": "AKA",
+      "identity": "testuser",
+      "password": "changeme"
+    },
+    "eap_aka_prime": {
+      "method": "AKA'",
+      "identity": "testuser",
+      "password": "changeme"
+    }
+  }
+}
