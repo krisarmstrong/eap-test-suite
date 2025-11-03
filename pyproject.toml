@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eap-test-suite"
+version = "0.2.0"
+description = "Automated testing suite for Extensible Authentication Protocol (EAP) authentication methods."
+readme = "README.md"
+requires-python = ">=3.14"
+license = {text = "MIT"}
+authors = [
+  {name = "Kris Armstrong", email = "kris.armstrong@me.com"}
+]
+keywords = ["radius", "eap", "networking", "testing"]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "pre-commit>=3.3",
+  "pytest>=8.1",
+  "ruff>=0.3.5"
+]
+test = [
+  "pytest>=8.1"
+]
+
+[project.scripts]
+"eap-test-suite" = "eap_test_suite.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+py-modules = ["version_bumper"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]

@@ -124,3 +124,4 @@ def main():
         logging.info("No version string found or no change needed.")
 
 if __name__ == '__main__':
+    main()

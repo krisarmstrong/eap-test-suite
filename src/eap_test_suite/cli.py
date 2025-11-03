@@ -22,9 +22,10 @@ Requirements:
 
 Usage:
 ```bash
-python3 eap_auth_test.py --eap PEAP
-python3 eap_auth_test.py  # Runs all configured EAP tests
-python3 eap_auth_test.py --debug  # Enables debug logging
+python3 -m eap_test_suite.cli --eap PEAP
+python3 -m eap_test_suite.cli  # Runs all configured EAP tests
+python3 -m eap_test_suite.cli --debug  # Enables debug logging
+eap-test-suite --debug  # After installation
 ```
 
 Author: [Your Name]
@@ -32,29 +33,56 @@ Date: [Date]
 License: MIT
 """
 
-import sys
-import json
-import subprocess
-import shutil
-import logging
 import argparse
+import json
+import logging
 import os
+import shutil
 import socket
-from pathlib import Path
+import subprocess
+import sys
+from dataclasses import dataclass
 from logging.handlers import RotatingFileHandler
-from collections import namedtuple
+from pathlib import Path
+from typing import Any
 
-# Configuration Constants
-CONFIG_FILE = Path("config/config.json")  # Path to the configuration file containing EAP test details
-LOG_FILE = Path("logs/eap_test.log")  # Log file location
+# Paths
+PACKAGE_ROOT = Path(__file__).resolve().parent
+SRC_ROOT = PACKAGE_ROOT.parent
+PROJECT_ROOT = SRC_ROOT.parent
+CONFIG_DIR = PROJECT_ROOT / "config"
+LOG_DIR = PROJECT_ROOT / "logs"
+CONFIG_FILE = CONFIG_DIR / "config.json"  # Path to the configuration file containing EAP test details
+LOG_FILE = LOG_DIR / "eap_test.log"  # Log file location
 MAX_LOG_SIZE = 5 * 1024 * 1024  # Maximum log file size (5MB) before rotation
 LOG_RETENTION_COUNT = 5  # Number of log files to retain
 DEPENDENCIES = ["jq", "wpa_supplicant", "git", "make", "gcc", "libssl-dev"]  # Required system dependencies
 EAPOL_TEST_PATH = Path("/usr/local/bin/eapol_test")  # Path to the compiled eapol_test binary
 HOSTAPD_REPO = "https://w1.fi/hostap.git"  # Git repository for hostapd source code
+HOSTAP_SOURCE_DIR = PROJECT_ROOT / "hostap"
 
-RadiusConfig = namedtuple("RadiusConfig", ["server", "port", "secret"])
-EAPTypeConfig = namedtuple("EAPTypeConfig", [])  # No specific EAP type config in this example
+
+@dataclass(frozen=True)
+class RadiusConfig:
+    server: str
+    port: int
+    secret: str
+
+
+@dataclass(frozen=True)
+class EAPTypeConfig:
+    name: str
+    settings: dict[str, Any]
+
+    @property
+    def conf_path(self) -> Path:
+        return CONFIG_DIR / f"{self.name}.conf"
+
+
+@dataclass(frozen=True)
+class TestConfig:
+    radius: RadiusConfig
+    eap_types: dict[str, EAPTypeConfig]
 
 
 def setup_logging(log_file):
@@ -198,14 +226,18 @@ def build_eapol_test():
 
     # Clean previous build artifacts
     logging.info("Cleaning previous build artifacts...")
-    if Path("hostap").exists():
-        shutil.rmtree("hostap")
+    if HOSTAP_SOURCE_DIR.exists():
+        shutil.rmtree(HOSTAP_SOURCE_DIR)
 
     logging.info("Cloning and building eapol_test from source...")
 
     try:
-        subprocess.run(["git", "clone", "git://w1.fi/srv/git/hostap.git"], check=True)
-        hostapd_dir = Path("hostap/wpa_supplicant")
+        subprocess.run(
+            ["git", "clone", HOSTAPD_REPO, str(HOSTAP_SOURCE_DIR)],
+            check=True,
+            cwd=PROJECT_ROOT,
+        )
+        hostapd_dir = HOSTAP_SOURCE_DIR / "wpa_supplicant"
 
         if hostapd_dir.exists():
             config_path = hostapd_dir / ".config"
@@ -260,7 +292,7 @@ def build_eapol_test():
                     file.write(line)
 
             env = os.environ.copy()
-            env['PKG_CONFIG_PATH'] = "/opt/homebrew/opt/openssl/lib/pkgconfig"
+            env.setdefault("PKG_CONFIG_PATH", "/opt/homebrew/opt/openssl/lib/pkgconfig")
 
             # Build eapol_test
             subprocess.run(["make", "eapol_test"], cwd=hostapd_dir, env=env, check=True)
@@ -318,7 +350,7 @@ def validate_eap_types_config(data):
     return True
 
 
-def load_config():
+def load_config() -> TestConfig:
     """
     Loads and validates the configuration file.
 
@@ -326,16 +358,13 @@ def load_config():
     and returns the validated configuration. It raises an error and exits the script if the configuration
     is invalid or if any required keys are missing.
 
-    Returns:
-        dict: A dictionary containing the validated radius configuration and EAP types configuration.
-
     Raises:
         ValueError: If the configuration structure or content is invalid.
         FileNotFoundError: If the configuration file is not found.
         json.JSONDecodeError: If there is an error parsing the configuration file.
     """
     try:
-        with CONFIG_FILE.open('r') as config_file:
+        with CONFIG_FILE.open("r", encoding="utf-8") as config_file:
             data = json.load(config_file)
 
         if not isinstance(data, dict) or "radius" not in data or "eap_types" not in data:
@@ -348,18 +377,20 @@ def load_config():
             raise ValueError("Invalid eap_types configuration.")
 
         radius_config = RadiusConfig(**data["radius"])
-        eap_types = {eap_type: EAPTypeConfig() for eap_type in
-                     data["eap_types"]}  # No EAP-specific config in this example.
+        eap_types = {
+            eap_type: EAPTypeConfig(name=eap_type, settings=dict(eap_data))
+            for eap_type, eap_data in data["eap_types"].items()
+        }
 
         logging.info("Configuration loaded successfully.")
-        return {"radius": radius_config, "eap_types": eap_types}
+        return TestConfig(radius=radius_config, eap_types=eap_types)
 
     except (ValueError, FileNotFoundError, json.JSONDecodeError) as e:
         logging.error(f"Failed to load configuration: {e}")
         sys.exit(1)
 
 
-def execute_eapol_test(config, eap_type):
+def execute_eapol_test(config: TestConfig, eap_type: str) -> None:
     """
     Executes eapol_test for the specified EAP type.
 
@@ -367,40 +398,49 @@ def execute_eapol_test(config, eap_type):
     parameters from the provided config dictionary. It logs the results of the test.
 
     Args:
-        config (dict): The configuration data loaded from the JSON file.
+        config (TestConfig): The configuration data loaded from the JSON file.
         eap_type (str): The EAP type to test.
 
     Logs:
         - Info messages indicating whether the test passed.
         - Error messages if the test failed or if the EAP type is not configured.
     """
-    eap_config = config["eap_types"].get(eap_type)
-    if not eap_config:
+    eap_config = config.eap_types.get(eap_type)
+    if eap_config is None:
         logging.error(f"EAP type {eap_type} is not configured.")
         return
 
-    radius_server = config["radius"]["server"]
-    radius_port = config["radius"]["port"]
-    radius_secret = config["radius"]["secret"]
+    config_file = eap_config.conf_path
+    if not config_file.exists():
+        logging.error("Configuration file %s not found for EAP type %s.", config_file, eap_type)
+        return
+
+    radius = config.radius
+
+    logging.debug("Executing eapol_test for %s using settings: %s", eap_type, eap_config.settings)
 
     # Prepare eapol_test command
     command = [
         str(EAPOL_TEST_PATH),
-        f"-a{radius_server}",
-        f"-p{radius_port}",
-        f"-s{radius_secret}",
-        f"-cconfig/{eap_type}.conf"  # Point to the config file for each EAP type
+        f"-a{radius.server}",
+        f"-p{radius.port}",
+        f"-s{radius.secret}",
+        f"-c{config_file}",
     ]
     try:
         result = subprocess.run(command, capture_output=True, text=True)
         if result.returncode == 0:
-            logging.info(f"EAP type {eap_type} test passed.")
-            logging.info(result.stdout)
+            logging.info("EAP type %s test passed.", eap_type)
+            if result.stdout:
+                logging.debug(result.stdout)
         else:
-            logging.error(f"EAP type {eap_type} test failed with return code: {result.returncode}")
-            logging.error(result.stderr)
+            logging.error(
+                "EAP type %s test failed with return code: %s", eap_type, result.returncode
+            )
+            if result.stderr:
+                logging.error(result.stderr)
     except OSError as e:
-        logging.error(f"EAP type {eap_type} test failed to execute: {e}")
+        logging.error("EAP type %s test failed to execute: %s", eap_type, e)
 
 
 def parse_args():
@@ -419,7 +459,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def is_radius_server_reachable(server, port):
+def is_radius_server_reachable(server: str, port: int) -> bool:
     """
     Checks if the RADIUS server is reachable.
 
@@ -440,14 +480,14 @@ def is_radius_server_reachable(server, port):
         return False
 
 
-def cleanup():
+def cleanup() -> None:
     """
     Cleans up temporary files and directories.
 
     This function removes the temporary hostap directory if it exists and logs the action.
     """
-    if Path("hostap").exists():
-        shutil.rmtree("hostap")
+    if HOSTAP_SOURCE_DIR.exists():
+        shutil.rmtree(HOSTAP_SOURCE_DIR)
         logging.info("Temporary hostap directory removed.")
 
 
@@ -476,32 +516,37 @@ def main():
     # Set up logging
     setup_logging(LOG_FILE)
 
-    # Build eapol_test if not already available
-    build_eapol_test()
+    try:
+        # Build eapol_test if not already available
+        build_eapol_test()
 
-    # Load configuration data
-    config = load_config()
+        # Load configuration data
+        config = load_config()
 
-    # Check if the RADIUS server is reachable
-    if not is_radius_server_reachable(config["radius"].server, config["radius"].port):
-        logging.error(f"Radius server {config["radius"].server}:{config["radius"].port} is not reachable.")
-        sys.exit(1)
+        # Check if the RADIUS server is reachable
+        radius = config.radius
+        if not is_radius_server_reachable(radius.server, radius.port):
+            logging.error("Radius server %s:%s is not reachable.", radius.server, radius.port)
+            sys.exit(1)
 
-    # Enable debug-level logging if the debug flag is specified
-    if args.debug:
-        logging.getLogger().setLevel(logging.DEBUG)
+        # Enable debug-level logging if the debug flag is specified
+        if args.debug:
+            logging.getLogger().setLevel(logging.DEBUG)
 
-    # Execute EAP tests for specified EAP types or all configured EAP types if none are specified
-    if args.eap:
-        for eap_type in args.eap:
-            if eap_type in config["eap_types"]:
-                execute_eapol_test(config, eap_type)
-            else:
-                logging.error(f"EAP type '{eap_type}' is not configured.")
-                sys.exit(1)
-    else:
-        for eap_type in config["eap_types"].keys():
+        # Execute EAP tests for specified EAP types or all configured EAP types if none are specified
+        if args.eap:
+            for eap_type in args.eap:
+                if eap_type in config.eap_types:
+                    execute_eapol_test(config, eap_type)
+                else:
+                    logging.error("EAP type '%s' is not configured.", eap_type)
+                    sys.exit(1)
+            return
+
+        for eap_type in config.eap_types:
             execute_eapol_test(config, eap_type)
+    finally:
+        cleanup()
 
 
 if __name__ == "__main__":
