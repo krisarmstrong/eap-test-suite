@@ -43,6 +43,10 @@ pip install -e .[dev]
 
 The script will automatically build eapol_test and install required dependencies on first run.
 
+### macOS Installation
+
+For detailed macOS-specific installation instructions, see [docs/INSTALL_MACOS.md](docs/INSTALL_MACOS.md).
+
 ## Usage
 
 Test all configured EAP types:
