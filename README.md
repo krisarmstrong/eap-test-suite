@@ -1,10 +1,16 @@
 # EAP Test Suite (Python 3)
 
+[![CI](https://github.com/krisarmstrong/eap-test-suite/workflows/CI/badge.svg)](https://github.com/krisarmstrong/eap-test-suite/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+
 Automated testing suite for EAP (Extensible Authentication Protocol) authentication methods.
 
 ## Description
 
 EAP Test Suite automates the testing of various EAP authentication methods supported by FreeRADIUS using the eapol_test tool from Hostapd. It detects system dependencies, builds required tools, and executes comprehensive authentication tests against RADIUS servers.
+
+This project is the modern successor to `freeradius-eapol-test-tool` (legacy bash implementation), providing a complete Python rewrite with enhanced features, better error handling, and cross-platform support.
 
 ## Features
 
