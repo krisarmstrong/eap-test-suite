@@ -82,3 +82,16 @@ Edit `config/config.json` to configure:
 ## License
 
 This project is licensed under the MIT License. See LICENSE file for details.
+
+## RADIUS EAP Testing
+
+This suite now includes comprehensive RADIUS EAP testing capabilities (merged from radius-eap-tester).
+
+### RADIUS Testing Features
+- RADIUS server authentication testing
+- Multiple EAP method support
+- RADIUS attribute validation
+- Server response analysis
+
+See `docs/RADIUS_EAP_TESTER.md` for detailed RADIUS testing documentation.
+
