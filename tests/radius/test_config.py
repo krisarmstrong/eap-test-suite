@@ -1,12 +1,19 @@
-import unittest
-import os
 import json
+import os
+import tempfile
+import unittest
 from radius_eap_tester.config import load_config, generate_config_template
+
 
 class TestConfig(unittest.TestCase):
     def setUp(self):
-        self.config_file = "conf/config.json"
-        self.temp_config = "test_config.json"
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.config_file = os.path.join(self.temp_dir.name, "config.json")
+        self.temp_config = os.path.join(self.temp_dir.name, "generated_config.json")
+        generate_config_template(self.config_file)
+
+    def tearDown(self):
+        self.temp_dir.cleanup()
 
     def test_load_config(self):
         config = load_config(self.config_file)
@@ -27,6 +34,7 @@ class TestConfig(unittest.TestCase):
         self.assertIn("server", config)
         self.assertIn("eap_methods", config)
         os.unlink(self.temp_config)
+
 
 if __name__ == "__main__":
     unittest.main()

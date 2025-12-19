@@ -13,7 +13,9 @@ authors = [
   {name = "Kris Armstrong", email = "kris.armstrong@me.com"}
 ]
 keywords = ["radius", "eap", "networking", "testing"]
-dependencies = []
+dependencies = [
+  "jsonschema>=4.21",
+]
 
 [project.optional-dependencies]
 dev = [
@@ -36,5 +38,13 @@ py-modules = ["version_bumper"]
 where = ["src"]
 
 [tool.pytest.ini_options]
-addopts = "-q"
+addopts = "-q --import-mode=importlib"
 testpaths = ["tests"]
+pythonpath = ["src", "src/radius"]
+
+[tool.ruff]
+line-length = 100
+extend-exclude = ["build", "dist", ".venv", "venv", ".tox", ".mypy_cache", ".ruff_cache"]
+
+[tool.black]
+line-length = 100

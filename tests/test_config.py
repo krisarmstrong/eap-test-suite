@@ -61,7 +61,9 @@ def test_load_config_invalid_triggers_exit(config_workspace: Path) -> None:
         eap_auth_test.load_config()
 
 
-def test_execute_eapol_test_requires_conf_file(config_workspace: Path, caplog: pytest.LogCaptureFixture) -> None:
+def test_execute_eapol_test_requires_conf_file(
+    config_workspace: Path, caplog: pytest.LogCaptureFixture
+) -> None:
     caplog.set_level("ERROR")
     write_config(config_workspace, minimal_config())
 

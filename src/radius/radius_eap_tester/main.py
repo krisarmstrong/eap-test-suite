@@ -13,15 +13,20 @@ from .eap_tests import EAPTestor
 from .utils import setup_logging
 import argparse
 import logging
-import os
 
 
 def main():
-    parser = argparse.ArgumentParser(description="EAPTestor v4.1 - EAP Testing Framework for FreeRADIUS")
+    parser = argparse.ArgumentParser(
+        description="EAPTestor v4.1 - EAP Testing Framework for FreeRADIUS"
+    )
     parser.add_argument("--parallel", action="store_true", help="Run tests in parallel")
     parser.add_argument("--config", default="conf/config.json", help="Path to config file")
-    parser.add_argument("--dry-run", action="store_true", help="Simulate test execution without running tests")
-    parser.add_argument("--generate-config", action="store_true", help="Generate a template config file")
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Simulate test execution without running tests"
+    )
+    parser.add_argument(
+        "--generate-config", action="store_true", help="Generate a template config file"
+    )
     parser.add_argument("--verbose", action="store_true", help="Enable debug logging")
     args = parser.parse_args()
 
@@ -40,6 +45,7 @@ def main():
         logger.error(f"EAPTestor execution failed: {e}")
         print(f"Error: {e}")
         exit(1)
+
 
 if __name__ == "__main__":
     main()

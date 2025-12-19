@@ -1,4 +1,6 @@
 # EAP Test Suite (Python 3)
+[![Checks](https://github.com/krisarmstrong/eap-test-suite/actions/workflows/checks.yml/badge.svg)](https://github.com/krisarmstrong/eap-test-suite/actions/workflows/checks.yml)
+
 
 [![CI](https://github.com/krisarmstrong/eap-test-suite/workflows/CI/badge.svg)](https://github.com/krisarmstrong/eap-test-suite/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -70,6 +72,12 @@ eap-test-suite --help
 ```
 
 ## Development
+Run the full local checks:
+
+```bash
+./check.sh
+```
+
 
 - Run linting and formatting: `pre-commit run --all-files`
 - Run the automated test suite: `pytest`

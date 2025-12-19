@@ -9,7 +9,7 @@ __version__ = "4.1.1"
 """
 
 import logging
-import os
+
 
 def setup_logging(log_file: str = "eaptestor.log", verbose: bool = False):
     """Configure logging to file and console."""

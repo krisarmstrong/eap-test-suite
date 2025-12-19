@@ -21,12 +21,14 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class EAPTest:
     name: str
     config: Dict
     requires_password: bool
     enabled: bool
+
 
 class EAPTestor:
     EAPOL_TEST_BIN = "eapol_test"  # Assumes in PATH or specify full path
@@ -41,12 +43,42 @@ class EAPTestor:
         eap_methods = self.config.get("eap_methods", {})
         return [
             EAPTest("tls", eap_methods["tls"]["config"], False, eap_methods["tls"]["enabled"]),
-            EAPTest("ttls_tls", eap_methods["ttls_tls"]["config"], False, eap_methods["ttls_tls"]["enabled"]),
-            EAPTest("peap_tls", eap_methods["peap_tls"]["config"], False, eap_methods["peap_tls"]["enabled"]),
-            EAPTest("peap_mschapv2", eap_methods["peap_mschapv2"]["config"], True, eap_methods["peap_mschapv2"]["enabled"]),
-            EAPTest("ttls_md5", eap_methods["ttls_md5"]["config"], True, eap_methods["ttls_md5"]["enabled"]),
-            EAPTest("ttls_mschapv2", eap_methods["ttls_mschapv2"]["config"], True, eap_methods["ttls_mschapv2"]["enabled"]),
-            EAPTest("eap_fast", eap_methods["eap_fast"]["config"], True, eap_methods["eap_fast"]["enabled"]),
+            EAPTest(
+                "ttls_tls",
+                eap_methods["ttls_tls"]["config"],
+                False,
+                eap_methods["ttls_tls"]["enabled"],
+            ),
+            EAPTest(
+                "peap_tls",
+                eap_methods["peap_tls"]["config"],
+                False,
+                eap_methods["peap_tls"]["enabled"],
+            ),
+            EAPTest(
+                "peap_mschapv2",
+                eap_methods["peap_mschapv2"]["config"],
+                True,
+                eap_methods["peap_mschapv2"]["enabled"],
+            ),
+            EAPTest(
+                "ttls_md5",
+                eap_methods["ttls_md5"]["config"],
+                True,
+                eap_methods["ttls_md5"]["enabled"],
+            ),
+            EAPTest(
+                "ttls_mschapv2",
+                eap_methods["ttls_mschapv2"]["config"],
+                True,
+                eap_methods["ttls_mschapv2"]["enabled"],
+            ),
+            EAPTest(
+                "eap_fast",
+                eap_methods["eap_fast"]["config"],
+                True,
+                eap_methods["eap_fast"]["enabled"],
+            ),
         ]
 
     def show_config(self):
@@ -57,7 +89,9 @@ class EAPTestor:
             if key not in ["private_key_password", "password", "secretkey"]:
                 print(f"{key.capitalize()}: {value}")
         print("Sensitive data (keys, passwords) omitted for security.")
-        enabled_methods = ", ".join(method for method, conf in self.config.get("eap_methods", {}).items() if conf["enabled"])
+        enabled_methods = ", ".join(
+            method for method, conf in self.config.get("eap_methods", {}).items() if conf["enabled"]
+        )
         logger.info(f"EAP methods enabled: {enabled_methods}")
         print(f"EAP methods enabled: {enabled_methods}")
 
@@ -86,7 +120,11 @@ class EAPTestor:
         for key in ["certificate_file", "private_key_file", "ca_cert", "pac_file"]:
             if key in test.config and test.config[key] and not os.path.exists(test.config[key]):
                 logger.error(f"Invalid {key} for {test.name}: {test.config[key]} does not exist")
-                return {"name": test.name, "status": "failed", "error": f"Invalid {key}: {test.config[key]} does not exist"}
+                return {
+                    "name": test.name,
+                    "status": "failed",
+                    "error": f"Invalid {key}: {test.config[key]} does not exist",
+                }
 
         # Create temporary config file
         with tempfile.NamedTemporaryFile(mode="w", suffix=".conf", delete=False) as temp_conf:
@@ -98,12 +136,18 @@ class EAPTestor:
         logger.info(f"Running {test.name} test")
         cmd = [
             self.EAPOL_TEST_BIN,
-            "-c", temp_conf_path,
-            "-a", self.config["server"]["ipaddress"],
-            "-p", str(self.config["server"]["port"]),
-            "-s", self.config["server"]["secretkey"],
-            "-r", "0",
-            "-M", self.config["server"]["identity"],
+            "-c",
+            temp_conf_path,
+            "-a",
+            self.config["server"]["ipaddress"],
+            "-p",
+            str(self.config["server"]["port"]),
+            "-s",
+            self.config["server"]["secretkey"],
+            "-r",
+            "0",
+            "-M",
+            self.config["server"]["identity"],
             "-o",
         ]
         if test.requires_password:
@@ -111,15 +155,27 @@ class EAPTestor:
 
         try:
             if not self.dry_run:
-                result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+                subprocess.run(cmd, capture_output=True, text=True, check=True)
                 logger.info(f"{test.name} test completed successfully")
-            status = {"name": test.name, "status": "success" if not self.dry_run else "dry_run", "error": None}
+            status = {
+                "name": test.name,
+                "status": "success" if not self.dry_run else "dry_run",
+                "error": None,
+            }
         except subprocess.CalledProcessError as e:
-            logger.error(f"{test.name} test failed: {e.stderr}. Check FreeRADIUS server and config.")
+            logger.error(
+                f"{test.name} test failed: {e.stderr}. Check FreeRADIUS server and config."
+            )
             status = {"name": test.name, "status": "failed", "error": e.stderr}
         except FileNotFoundError:
-            logger.error(f"{test.name} test failed: {self.EAPOL_TEST_BIN} not found. Ensure it is installed.")
-            status = {"name": test.name, "status": "failed", "error": f"{self.EAPOL_TEST_BIN} not found"}
+            logger.error(
+                f"{test.name} test failed: {self.EAPOL_TEST_BIN} not found. Ensure it is installed."
+            )
+            status = {
+                "name": test.name,
+                "status": "failed",
+                "error": f"{self.EAPOL_TEST_BIN} not found",
+            }
         finally:
             try:
                 os.unlink(temp_conf_path)
@@ -135,7 +191,9 @@ class EAPTestor:
 
         enabled_tests = [test for test in self.tests if test.enabled]
         if not enabled_tests:
-            logger.warning("No EAP methods enabled. Update config.json to enable at least one method.")
+            logger.warning(
+                "No EAP methods enabled. Update config.json to enable at least one method."
+            )
             print("Warning: No EAP methods enabled.")
             return results
 

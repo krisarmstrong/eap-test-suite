@@ -52,11 +52,20 @@ SRC_ROOT = PACKAGE_ROOT.parent
 PROJECT_ROOT = SRC_ROOT.parent
 CONFIG_DIR = PROJECT_ROOT / "config"
 LOG_DIR = PROJECT_ROOT / "logs"
-CONFIG_FILE = CONFIG_DIR / "config.json"  # Path to the configuration file containing EAP test details
+CONFIG_FILE = (
+    CONFIG_DIR / "config.json"
+)  # Path to the configuration file containing EAP test details
 LOG_FILE = LOG_DIR / "eap_test.log"  # Log file location
 MAX_LOG_SIZE = 5 * 1024 * 1024  # Maximum log file size (5MB) before rotation
 LOG_RETENTION_COUNT = 5  # Number of log files to retain
-DEPENDENCIES = ["jq", "wpa_supplicant", "git", "make", "gcc", "libssl-dev"]  # Required system dependencies
+DEPENDENCIES = [
+    "jq",
+    "wpa_supplicant",
+    "git",
+    "make",
+    "gcc",
+    "libssl-dev",
+]  # Required system dependencies
 EAPOL_TEST_PATH = Path("/usr/local/bin/eapol_test")  # Path to the compiled eapol_test binary
 HOSTAPD_REPO = "https://w1.fi/hostap.git"  # Git repository for hostapd source code
 HOSTAP_SOURCE_DIR = PROJECT_ROOT / "hostap"
@@ -109,11 +118,8 @@ def setup_logging(log_file):
     # Set up basic logging configuration with file rotation and console output
     logging.basicConfig(
         level=logging.INFO,
-        format='%(asctime)s [%(levelname)s] %(message)s',
-        handlers=[
-            handler,
-            logging.StreamHandler(sys.stdout)
-        ]
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        handlers=[handler, logging.StreamHandler(sys.stdout)],
     )
 
 
@@ -180,7 +186,7 @@ def install_dependencies():
 
     packages_to_install = []
     for p in packages:
-        base_package = p.split('-')[0]  # Split to remove -dev or -devel
+        base_package = p.split("-")[0]  # Split to remove -dev or -devel
         if not is_package_installed(base_package):
             packages_to_install.append(p)
 
@@ -188,11 +194,15 @@ def install_dependencies():
         try:
             if package_manager == "apt":
                 subprocess.run(["sudo", "apt-get", "update"], check=True)
-                subprocess.run(["sudo", "apt-get", "install", "-y", *packages_to_install], check=True)
+                subprocess.run(
+                    ["sudo", "apt-get", "install", "-y", *packages_to_install], check=True
+                )
             elif package_manager == "dnf":
                 subprocess.run(["sudo", "dnf", "install", "-y", *packages_to_install], check=True)
             elif package_manager == "pacman":
-                subprocess.run(["sudo", "pacman", "-Sy", "--noconfirm", *packages_to_install], check=True)
+                subprocess.run(
+                    ["sudo", "pacman", "-Sy", "--noconfirm", *packages_to_install], check=True
+                )
             elif package_manager == "brew":
                 subprocess.run(["brew", "install", *packages_to_install], check=True)
         except subprocess.CalledProcessError as e:
@@ -200,10 +210,13 @@ def install_dependencies():
             sys.exit(1)
 
     # Install Xcode Command Line Tools on macOS if needed
-    if sys.platform == 'darwin':
+    if sys.platform == "darwin":
         try:
             # Check if Xcode Command Line Tools are already installed
-            if subprocess.run(["xcode-select", "--print-path"], capture_output=True).returncode != 0:
+            if (
+                subprocess.run(["xcode-select", "--print-path"], capture_output=True).returncode
+                != 0
+            ):
                 subprocess.run(["xcode-select", "--install"], check=True)
             else:
                 logging.info("Xcode Command Line Tools are already installed.")
@@ -257,7 +270,9 @@ def build_eapol_test():
                     elif "CFLAGS += -I/usr/local/openssl/include" in line:
                         config_file.write("CFLAGS += -I/opt/homebrew/opt/openssl/include/openssl\n")
                     elif "LIBS += -L/usr/local/openssl/lib" in line:
-                        config_file.write("LIBS += -L/opt/homebrew/opt/openssl/lib -lssl -lcrypto\n")
+                        config_file.write(
+                            "LIBS += -L/opt/homebrew/opt/openssl/lib -lssl -lcrypto\n"
+                        )
                     else:
                         config_file.write(line)
 
@@ -269,7 +284,7 @@ def build_eapol_test():
                     "CONFIG_TLSV12=y\n",
                     "CONFIG_TLSV13=y\n",  # Ensure TLS 1.3 support
                     "CONFIG_TLS_FUNCS=y\n",
-                    "CONFIG_OSX=y\n"  # Ensure macOS build compatibility
+                    "CONFIG_OSX=y\n",  # Ensure macOS build compatibility
                 ]
 
                 for config in required_configs:
@@ -288,7 +303,8 @@ def build_eapol_test():
                 for line in lines:
                     if line.strip() == "#include <stddef.h>":
                         file.write(
-                            "#ifdef __APPLE__\n#include <libkern/OSByteOrder.h>\n#define bswap_64(x) OSSwapInt64(x)\n#else\n#include <byteswap.h>\n#endif\n")
+                            "#ifdef __APPLE__\n#include <libkern/OSByteOrder.h>\n#define bswap_64(x) OSSwapInt64(x)\n#else\n#include <byteswap.h>\n#endif\n"
+                        )
                     file.write(line)
 
             env = os.environ.copy()
@@ -324,7 +340,11 @@ def validate_radius_config(data):
         return False
     if not all(key in data for key in ["server", "port", "secret"]):
         return False
-    if not isinstance(data["server"], str) or not isinstance(data["port"], int) or not isinstance(data["secret"], str):
+    if (
+        not isinstance(data["server"], str)
+        or not isinstance(data["port"], int)
+        or not isinstance(data["secret"], str)
+    ):
         return False
     return True
 
@@ -345,7 +365,9 @@ def validate_eap_types_config(data):
     if not isinstance(data, dict):
         return False
     for eap_type, eap_data in data.items():
-        if not isinstance(eap_data, dict):  # In the case of no EAP-specific config, this will be an empty dictionary.
+        if not isinstance(
+            eap_data, dict
+        ):  # In the case of no EAP-specific config, this will be an empty dictionary.
             return False
     return True
 
@@ -454,7 +476,13 @@ def parse_args():
         argparse.Namespace: The parsed command-line arguments.
     """
     parser = argparse.ArgumentParser(description="EAP Authentication Test Script")
-    parser.add_argument("-e", "--eap", type=str, nargs='*', help="Test specific EAP types from the configuration file")
+    parser.add_argument(
+        "-e",
+        "--eap",
+        type=str,
+        nargs="*",
+        help="Test specific EAP types from the configuration file",
+    )
     parser.add_argument("-d", "--debug", action="store_true", help="Enable debug logging")
     return parser.parse_args()
 
