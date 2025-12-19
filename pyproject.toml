@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "eap-test-suite"
-version = "0.2.0"
+version = "0.2.1"
 description = "Automated testing suite for Extensible Authentication Protocol (EAP) authentication methods."
 readme = "README.md"
 requires-python = ">=3.14"
