@@ -163,3 +163,9 @@ hostap/
 logs/
 .pyc-cache/
 archive/
+
+# Tooling defaults
+.DS_Store
+.env.*
+.venv/
+.ruff_cache/

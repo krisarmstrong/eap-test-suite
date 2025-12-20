@@ -1,4 +1,5 @@
 """EAP Test Suite package."""
 
-__all__ = ["cli"]
-__version__ = "0.2.0"
+from ._version import version as __version__
+
+__all__ = ["cli", "__version__"]

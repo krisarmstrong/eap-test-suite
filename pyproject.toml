@@ -32,7 +32,6 @@ test = [
 
 [tool.setuptools]
 package-dir = {"" = "src"}
-py-modules = ["version_bumper"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
