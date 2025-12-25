@@ -169,3 +169,5 @@ archive/
 .env.*
 .venv/
 .ruff_cache/
+hostap/
+logs/
