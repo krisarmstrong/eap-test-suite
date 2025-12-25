@@ -31,15 +31,14 @@ test = [
 "eap-test-suite" = "eap_test_suite.cli:main"
 
 [tool.setuptools]
-package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["."]
 
 [tool.pytest.ini_options]
 addopts = "-q --import-mode=importlib"
 testpaths = ["tests"]
-pythonpath = ["src", "src/radius"]
+
 
 [tool.ruff]
 line-length = 100
