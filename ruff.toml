@@ -1,0 +1,49 @@
+# Ruff configuration - Platinum Python 3.14.2 standards
+# https://docs.astral.sh/ruff/
+
+target-version = "py314"
+line-length = 100
+indent-width = 4
+
+[lint]
+# Enable all rules by default, then selectively disable
+select = ["ALL"]
+ignore = [
+    "D203",    # one-blank-line-before-class (conflicts with D211)
+    "D213",    # multi-line-summary-second-line (conflicts with D212)
+    "COM812",  # trailing-comma-missing (conflicts with formatter)
+    "ISC001",  # single-line-implicit-string-concatenation (conflicts with formatter)
+    "ANN101",  # missing-type-self
+    "ANN102",  # missing-type-cls
+]
+
+# Allow fix for all enabled rules
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when prefixed with underscore
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[lint.per-file-ignores]
+"__init__.py" = ["F401", "D104"]
+"tests/**/*" = ["S101", "PLR2004", "D100", "D103"]
+"test_*.py" = ["S101", "PLR2004", "D100", "D103"]
+
+[lint.pydocstyle]
+convention = "google"
+
+[lint.isort]
+known-first-party = []
+
+[lint.mccabe]
+max-complexity = 15
+
+[format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[lint.flake8-quotes]
+docstring-quotes = "double"
+inline-quotes = "double"
