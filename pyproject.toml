@@ -14,17 +14,25 @@ authors = [
 ]
 keywords = ["radius", "eap", "networking", "testing"]
 dependencies = [
-  "jsonschema>=4.21",
+  "jsonschema>=4.23",
 ]
 
 [project.optional-dependencies]
 dev = [
-  "pre-commit>=3.3",
-  "pytest>=8.1",
-  "ruff>=0.3.5"
+  "pre-commit>=4.0",
+  "pytest>=8.3",
+  "pytest-cov>=6.0",
+  "ruff>=0.11",
+  "bandit>=1.8",
+  "mypy>=1.14"
 ]
 test = [
-  "pytest>=8.1"
+  "pytest>=8.3",
+  "pytest-cov>=6.0"
+]
+security = [
+  "bandit>=1.8",
+  "safety>=3.0"
 ]
 
 [project.scripts]
@@ -42,7 +50,92 @@ testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 100
+target-version = "py314"
 extend-exclude = ["build", "dist", ".venv", "venv", ".tox", ".mypy_cache", ".ruff_cache"]
 
-[tool.black]
-line-length = 100
+[tool.ruff.lint]
+select = [
+  "E",      # pycodestyle errors
+  "W",      # pycodestyle warnings
+  "F",      # pyflakes
+  "I",      # isort
+  "N",      # pep8-naming
+  "UP",     # pyupgrade
+  "ANN",    # flake8-annotations
+  "ASYNC",  # flake8-async
+  "S",      # flake8-bandit (security)
+  "BLE",    # flake8-blind-except
+  "FBT",    # flake8-boolean-trap
+  "B",      # flake8-bugbear
+  "A",      # flake8-builtins
+  "COM",    # flake8-commas
+  "C4",     # flake8-comprehensions
+  "DTZ",    # flake8-datetimez
+  "T10",    # flake8-debugger
+  "EM",     # flake8-errmsg
+  "EXE",    # flake8-executable
+  "FA",     # flake8-future-annotations
+  "ISC",    # flake8-implicit-str-concat
+  "ICN",    # flake8-import-conventions
+  "LOG",    # flake8-logging
+  "G",      # flake8-logging-format
+  "INP",    # flake8-no-pep420
+  "PIE",    # flake8-pie
+  "T20",    # flake8-print
+  "PYI",    # flake8-pyi
+  "PT",     # flake8-pytest-style
+  "Q",      # flake8-quotes
+  "RSE",    # flake8-raise
+  "RET",    # flake8-return
+  "SLF",    # flake8-self
+  "SLOT",   # flake8-slots
+  "SIM",    # flake8-simplify
+  "TID",    # flake8-tidy-imports
+  "TCH",    # flake8-type-checking
+  "INT",    # flake8-gettext
+  "ARG",    # flake8-unused-arguments
+  "PTH",    # flake8-use-pathlib
+  "TD",     # flake8-todos
+  "FIX",    # flake8-fixme
+  "ERA",    # eradicate
+  "PD",     # pandas-vet
+  "PGH",    # pygrep-hooks
+  "PL",     # pylint
+  "TRY",    # tryceratops
+  "FLY",    # flynt
+  "NPY",    # numpy-specific
+  "PERF",   # perflint
+  "FURB",   # refurb
+  "RUF",    # ruff-specific
+]
+ignore = [
+  "ANN101",  # missing type self
+  "ANN102",  # missing type cls
+  "ANN401",  # dynamically typed Any
+  "COM812",  # trailing comma (conflicts with formatter)
+  "ISC001",  # implicit string concat (conflicts with formatter)
+  "S101",    # assert used (OK in tests)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101", "ANN", "PLR2004"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["eap_test_suite"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.bandit]
+exclude_dirs = ["tests", ".venv", "venv"]
+skips = ["B101"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
