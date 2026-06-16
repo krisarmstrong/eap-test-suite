@@ -8,16 +8,16 @@ Author: Kris Armstrong
 __version__ = "4.1.1"
 """
 
-import subprocess
+import json
 import logging
 import os
+import subprocess
 import tempfile
-import json
-from dataclasses import dataclass
-from typing import Dict, List
 from concurrent.futures import ThreadPoolExecutor
-from tqdm import tqdm
+from dataclasses import dataclass
 from datetime import datetime
+
+from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class EAPTest:
     name: str
-    config: Dict
+    config: dict
     requires_password: bool
     enabled: bool
 
@@ -33,12 +33,12 @@ class EAPTest:
 class EAPTestor:
     EAPOL_TEST_BIN = "eapol_test"  # Assumes in PATH or specify full path
 
-    def __init__(self, config: Dict, dry_run: bool = False):
+    def __init__(self, config: dict, dry_run: bool = False):
         self.config = config
         self.dry_run = dry_run
         self.tests = self.define_tests()
 
-    def define_tests(self) -> List[EAPTest]:
+    def define_tests(self) -> list[EAPTest]:
         """Define EAP tests based on configuration."""
         eap_methods = self.config.get("eap_methods", {})
         return [
@@ -95,7 +95,7 @@ class EAPTestor:
         logger.info(f"EAP methods enabled: {enabled_methods}")
         print(f"EAP methods enabled: {enabled_methods}")
 
-    def update_key(self, config_data: Dict, config_file: str):
+    def update_key(self, config_data: dict, config_file: str):
         """Update private key password in temporary config file."""
         logger.debug("Updating private key in %s", config_file)
         try:
@@ -106,7 +106,7 @@ class EAPTestor:
             logger.error(f"Failed to update %s: {e}. Ensure write permissions.", config_file)
             raise
 
-    def run_test(self, test: EAPTest) -> Dict:
+    def run_test(self, test: EAPTest) -> dict:
         """Run a single EAP test and return result."""
         if not test.enabled:
             logger.info(f"Skipping {test.name} (disabled)")

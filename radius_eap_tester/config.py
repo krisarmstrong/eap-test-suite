@@ -9,10 +9,10 @@ __version__ = "4.1.1"
 """
 
 import json
-import os
 import logging
-from jsonschema import validate, ValidationError
-from typing import Dict
+import os
+
+from jsonschema import ValidationError, validate
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +71,7 @@ CONFIG_SCHEMA = {
 }
 
 
-def load_config(config_path: str) -> Dict:
+def load_config(config_path: str) -> dict:
     """Load and validate configuration from JSON."""
     if not os.path.exists(config_path):
         logger.error(
@@ -79,14 +79,14 @@ def load_config(config_path: str) -> Dict:
         )
         raise FileNotFoundError(f"Config file {config_path} not found")
 
-    with open(config_path, "r") as f:
+    with open(config_path) as f:
         config = json.load(f)
 
     try:
         validate(instance=config, schema=CONFIG_SCHEMA)
     except ValidationError as e:
         logger.error(f"Invalid configuration: {e.message}. Check {config_path} against the schema.")
-        raise ValueError(f"Invalid configuration: {e.message}")
+        raise ValueError(f"Invalid configuration: {e.message}") from e
 
     # Override sensitive settings with environment variables if present
     server = config["server"]

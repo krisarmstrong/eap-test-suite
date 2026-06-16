@@ -2,7 +2,8 @@ import json
 import os
 import tempfile
 import unittest
-from radius_eap_tester.config import load_config, generate_config_template
+
+from radius_eap_tester.config import generate_config_template, load_config
 
 
 class TestConfig(unittest.TestCase):
@@ -29,7 +30,7 @@ class TestConfig(unittest.TestCase):
     def test_generate_config(self):
         generate_config_template(self.temp_config)
         self.assertTrue(os.path.exists(self.temp_config))
-        with open(self.temp_config, "r") as f:
+        with open(self.temp_config) as f:
             config = json.load(f)
         self.assertIn("server", config)
         self.assertIn("eap_methods", config)
