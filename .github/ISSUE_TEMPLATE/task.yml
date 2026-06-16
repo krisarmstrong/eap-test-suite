@@ -1,0 +1,60 @@
+name: Task
+description: Track maintenance, refactoring, dependency, CI, or documentation work for Eap Test Suite
+title: "Chore: "
+labels: ["type: chore", "status: needs-triage"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What work needs to be done?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - area: api
+        - area: build
+        - area: ci
+        - area: cli
+        - area: config
+        - area: data
+        - area: docs
+        - area: frontend
+        - area: infra
+        - area: packaging
+        - area: security
+        - area: tests
+        - area: tooling
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - priority: critical
+        - priority: high
+        - priority: medium
+        - priority: low
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Technical Notes
+  - type: textarea
+    id: related
+    attributes:
+      label: Related Issues or Pull Requests

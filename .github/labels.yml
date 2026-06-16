@@ -1,0 +1,123 @@
+- name: "type: defect"
+  color: D73A4A
+  description: "Product defect or regression."
+- name: "type: feature"
+  color: 0E8A16
+  description: "New feature or enhancement."
+- name: "type: chore"
+  color: FEF2C0
+  description: "Maintenance, refactoring, tooling, or dependency work."
+- name: "type: docs"
+  color: 0075CA
+  description: "Documentation work."
+- name: "type: security"
+  color: B60205
+  description: "Security vulnerability or hardening work."
+- name: "type: epic"
+  color: 8B5CF6
+  description: "Tracking issue that groups related work."
+- name: "priority: critical"
+  color: B60205
+  description: "Release blocker or urgent customer impact."
+- name: "priority: high"
+  color: D93F0B
+  description: "Important work for the current milestone."
+- name: "priority: medium"
+  color: FBCA04
+  description: "Useful work with normal priority."
+- name: "priority: low"
+  color: C5DEF5
+  description: "Low urgency or future consideration."
+- name: "severity: critical"
+  color: B60205
+  description: "Crash, data loss, security exposure, or unusable release."
+- name: "severity: high"
+  color: D93F0B
+  description: "Major workflow broken with no good workaround."
+- name: "severity: medium"
+  color: FBCA04
+  description: "Partial breakage or workaround exists."
+- name: "severity: low"
+  color: C5DEF5
+  description: "Minor functional or cosmetic issue."
+- name: "status: needs-triage"
+  color: EDEDED
+  description: "Awaiting owner triage."
+- name: "status: accepted"
+  color: 0E8A16
+  description: "Accepted for implementation."
+- name: "status: in-progress"
+  color: 1D76DB
+  description: "Work is actively underway."
+- name: "status: blocked"
+  color: B60205
+  description: "Blocked by a dependency or decision."
+- name: "status: needs-info"
+  color: D876E3
+  description: "Needs more information before work can proceed."
+- name: "status: ready-for-review"
+  color: 5319E7
+  description: "Implementation is ready for review."
+- name: "area: api"
+  color: D4C5F9
+  description: "Api area."
+- name: "area: build"
+  color: D4C5F9
+  description: "Build area."
+- name: "area: ci"
+  color: D4C5F9
+  description: "Ci area."
+- name: "area: cli"
+  color: D4C5F9
+  description: "Cli area."
+- name: "area: config"
+  color: D4C5F9
+  description: "Config area."
+- name: "area: data"
+  color: D4C5F9
+  description: "Data area."
+- name: "area: docs"
+  color: D4C5F9
+  description: "Docs area."
+- name: "area: frontend"
+  color: D4C5F9
+  description: "Frontend area."
+- name: "area: infra"
+  color: D4C5F9
+  description: "Infra area."
+- name: "area: packaging"
+  color: D4C5F9
+  description: "Packaging area."
+- name: "area: security"
+  color: D4C5F9
+  description: "Security area."
+- name: "area: tests"
+  color: D4C5F9
+  description: "Tests area."
+- name: "area: tooling"
+  color: D4C5F9
+  description: "Tooling area."
+- name: "good first issue"
+  color: 7057FF
+  description: "Small, well-scoped issue for a first contribution."
+- name: "help wanted"
+  color: 008672
+  description: "Extra attention is welcome."
+- name: "duplicate"
+  color: CFD3D7
+  description: "Duplicate of another issue or pull request."
+- name: "invalid"
+  color: E4E669
+  description: "Not actionable or not applicable."
+- name: "wontfix"
+  color: FFFFFF
+  description: "Intentionally not planned."
+- name: "dependencies"
+  color: 0366D6
+  description: "Dependency update."
+- name: "release: pending"
+  color: EDEDED
+  description: "Release automation is pending."
+- name: "release: tagged"
+  color: EDEDED
+  description: "Release automation tagged this change."
