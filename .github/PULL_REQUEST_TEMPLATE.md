@@ -1,24 +1,39 @@
-## Description
+## Summary
 
-Brief description of the changes.
+<!-- What changed and why? Keep this short and concrete. -->
+
+## Linked Issue
+
+<!-- Use Fixes #123, Closes #123, or Related to #123. Every PR should point at tracked work unless it is emergency maintenance. -->
+
+Fixes #
 
 ## Type of Change
 
-- [ ] Bug fix (non-breaking change that fixes an issue)
-- [ ] New feature (non-breaking change that adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to change)
-- [ ] Documentation update
+- [ ] Defect fix
+- [ ] Feature
+- [ ] Chore / refactor / dependency update
+- [ ] Documentation
+- [ ] CI / release / packaging
+- [ ] Security hardening
 
-## Checklist
+## Risk
 
-- [ ] My code follows the project's style guidelines
-- [ ] I have performed a self-review of my code
-- [ ] I have commented my code where necessary
-- [ ] I have updated the documentation accordingly
-- [ ] My changes generate no new warnings
-- [ ] I have added tests that prove my fix/feature works
-- [ ] New and existing tests pass locally
+- [ ] Low
+- [ ] Medium
+- [ ] High
 
-## Related Issues
+## Testing Evidence
 
-Closes #
+<!-- Paste the exact commands you ran and the meaningful result. "Not run" requires a reason. -->
+
+```text
+
+```
+
+## Security and Release Checklist
+
+- [ ] No secrets, tokens, credentials, or customer data are included.
+- [ ] Mutating routes, auth surfaces, permission checks, and output encoding were reviewed if touched.
+- [ ] Dependencies are pinned and justified if changed.
+- [ ] Documentation, screenshots, or operator notes were updated if behavior changed.

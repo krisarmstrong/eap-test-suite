@@ -2,5 +2,5 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+ruff format --check .
 ruff check .
-black --check .

@@ -21,7 +21,7 @@ dependencies = [
 dev = [
   "pre-commit>=3.3",
   "pytest>=8.1",
-  "ruff>=0.3.5"
+  "ruff==0.15.17"
 ]
 test = [
   "pytest>=8.1"
@@ -34,15 +34,18 @@ test = [
 
 [tool.setuptools.packages.find]
 where = ["."]
+include = ["eap_test_suite*", "radius_eap_tester*"]
 
 [tool.pytest.ini_options]
 addopts = "-q --import-mode=importlib"
 testpaths = ["tests"]
 
-
 [tool.ruff]
 line-length = 100
 extend-exclude = ["build", "dist", ".venv", "venv", ".tox", ".mypy_cache", ".ruff_cache"]
 
-[tool.black]
-line-length = 100
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+docstring-code-format = true

@@ -364,7 +364,7 @@ def validate_eap_types_config(data):
     """
     if not isinstance(data, dict):
         return False
-    for eap_type, eap_data in data.items():
+    for _eap_type, eap_data in data.items():
         if not isinstance(
             eap_data, dict
         ):  # In the case of no EAP-specific config, this will be an empty dictionary.
@@ -504,7 +504,7 @@ def is_radius_server_reachable(server: str, port: int) -> bool:
     try:
         with socket.create_connection((server, port), timeout=5):
             return True
-    except (OSError, TimeoutError):
+    except OSError, TimeoutError:
         return False
 
 

@@ -8,11 +8,12 @@ Author: Kris Armstrong
 __version__ = "4.1.1"
 """
 
-from .config import load_config, generate_config_template
-from .eap_tests import EAPTestor
-from .utils import setup_logging
 import argparse
 import logging
+
+from .config import generate_config_template, load_config
+from .eap_tests import EAPTestor
+from .utils import setup_logging
 
 
 def main():
