@@ -14,7 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Validate PR body
-        if: github.event_name == 'pull_request'
+        # Bot PRs (Dependabot, Renovate, release-please) carry generated bodies; the job still passes.
+        if: github.event_name == 'pull_request' && github.event.pull_request.user.type != 'Bot'
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
